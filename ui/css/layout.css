@@ -1,0 +1,156 @@
+#app-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#top-toolbar {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.toolbar-row::-webkit-scrollbar {
+  display: none;
+}
+
+.tier-upper {
+  height: 48px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.tier-lower {
+  height: 42px;
+  background: rgba(14, 15, 17, 0.6);
+}
+
+#viewport-container {
+  flex: 1;
+  position: relative;
+  background: var(--bg-main);
+  overflow: hidden;
+  min-height: 0;
+}
+
+#cy-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+#bottom-bar {
+  height: 52px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 20px;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   ON-SCREEN ERROR NOTIFICATION BANNER (No Silent Failure)
+   ========================================================================== */
+.error-banner-card {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 580px;
+  max-width: 90vw;
+  background: rgba(26, 10, 10, 0.96);
+  backdrop-filter: blur(12px);
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(239, 68, 68, 0.25), 0 0 0 1px rgba(239, 68, 68, 0.4);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+}
+
+.error-banner-card.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+.error-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.error-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.error-icon {
+  color: #ef4444;
+  font-size: 14px;
+}
+.error-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #f87171;
+  font-family: var(--font-mono);
+}
+.error-close-btn {
+  background: transparent;
+  border: none;
+  color: #fca5a5;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.error-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fff;
+}
+
+.error-msg-body {
+  font-size: 11px;
+  color: #fee2e2;
+  margin-top: 6px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.error-trace-box {
+  margin-top: 8px;
+  background: #0d0404;
+  border: 1px solid #450a0a;
+  border-radius: 4px;
+  padding: 8px 10px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.error-trace-box.hidden {
+  display: none;
+}
+.error-trace-box pre {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #fca5a5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

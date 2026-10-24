@@ -1,0 +1,25 @@
+.player-controls { display: flex; align-items: center; gap: 8px; }
+.btn-play { background: var(--bg-surface); border: 1px solid var(--border); color: #fff; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+.btn-icon { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-dim); padding: 5px 8px; border-radius: 4px; cursor: pointer; }
+.counter { font-family: var(--font-mono); font-size: 13px; margin-left: 4px; }
+.slider-wrapper { flex: 1; }
+.slider-wrapper input { width: 100%; accent-color: var(--accent-blue); }
+.legend-row { display: flex; gap: 10px; font-size: 10px; color: var(--text-dim); }
+.chip { display: flex; align-items: center; gap: 4px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; }
+.dot.origin { background: var(--accent-blue); }
+.dot.active { background: var(--accent-green); }
+.dot.latent { background: var(--accent-purple); }
+.dot.unreached { background: #475569; }
+
+/* Gradient Legend */
+#gradient-legend-badge { position: absolute; bottom: 16px; left: 16px; background: rgba(21, 23, 24, 0.9); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; min-width: 200px; z-index: 5; }
+.legend-title { font-size: 10px; font-weight: 600; color: var(--text-dim); display: block; margin-bottom: 4px; }
+.gradient-bar { width: 100%; height: 6px; border-radius: 3px; }
+.gradient-labels { display: flex; justify-content: space-between; font-size: 8px; font-family: var(--font-mono); color: var(--text-dim); margin-top: 2px; }
+
+/* Stats HUD */
+#summary-badge { position: absolute; top: 14px; left: 14px; background: rgba(21, 23, 24, 0.9); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; display: flex; gap: 10px; align-items: center; z-index: 5; }
+.stat-unit .lbl { font-size: 9px; color: var(--text-dim); display: block; }
+.stat-unit .val { font-size: 12px; font-weight: 600; font-family: var(--font-mono); }
+.divider { width: 1px; height: 18px; background: var(--border); }

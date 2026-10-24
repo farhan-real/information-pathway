@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Information Pathway</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/modules/toolbar.css" />
+  <link rel="stylesheet" href="css/modules/inspector.css" />
+  <link rel="stylesheet" href="css/modules/timeline.css" />
+  <link rel="stylesheet" href="css/modules/editor.css" />
+</head>
+<body>
+  <div id="app-shell">
+    
+    <!-- 2-TIER TOP TOOLBAR DECK -->
+    <header id="top-toolbar">
+      
+      <!-- ROW 1: System, Mode Switcher, Scenarios, Routing & Actions -->
+      <div class="toolbar-row tier-upper">
+        <div class="brand-cluster">
+          <div class="brand-indicator"></div>
+          <h1 class="logo">Information Pathway</h1>
+        </div>
+
+        <!-- Mode Toggle -->
+        <div class="mode-switch-wrapper">
+          <button id="btn-mode-forward" class="mode-pill-btn active" title="Forward Simulation Mode">
+            <span class="mode-icon">▶</span>
+            <span>Forward Spread</span>
+          </button>
+          <button id="btn-mode-reverse" class="mode-pill-btn" title="Reverse Inference Mode">
+            <span class="mode-icon">⟲</span>
+            <span>Reverse Inference</span>
+          </button>
+        </div>
+
+        <!-- Routing Dropdowns -->
+        <div class="routing-cluster">
+          <div class="select-field">
+            <span class="field-tag">SCENARIO</span>
+            <select id="scenario-select" class="custom-select select-scenario"></select>
+          </div>
+
+          <div class="select-field">
+            <span class="field-tag">SOURCE</span>
+            <select id="origin-select" class="custom-select select-person"></select>
+          </div>
+
+          <div class="select-field">
+            <span class="field-tag">ABOUT</span>
+            <select id="target-select" class="custom-select select-person">
+              <option value="">Nobody (General)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-cluster">
+          <button id="btn-open-editor" class="btn-studio-edit" title="Open Network Studio">
+            <span class="btn-icon">⚙</span>
+            <span>Studio</span>
+          </button>
+          <button id="btn-run-sim" class="btn-execute">
+            <span id="btn-exec-icon" class="btn-glyph">▶</span>
+            <span id="btn-exec-label">Simulate Spread</span>
+          </button>
+          <button id="btn-fit" class="btn-utility icon-only" title="Center View">⛶</button>
+          <button id="btn-reheat" class="btn-utility icon-only" title="Re-arrange Physics">↺</button>
+        </div>
+      </div>
+
+      <!-- ROW 2: Gradient Select, Dynamic Topic Presets & Sliders -->
+      <div class="toolbar-row tier-lower">
+        <div class="visual-cluster">
+          <div class="select-field">
+            <span class="field-tag">COLOR BY</span>
+            <select id="gradient-select" class="custom-select select-gradient">
+              <option value="time">Spread Speed (Time)</option>
+              <option value="probability">Belief & Confidence</option>
+              <option value="fidelity">Story Accuracy</option>
+              <option value="exposure">Echo Chamber (Loops)</option>
+              <option value="extraversion">Talkative (Extrovert)</option>
+              <option value="discretion">Secret-Keeper</option>
+              <option value="groups">Affiliation Cliques</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="tags-cluster">
+          <span class="field-tag">TOPIC</span>
+          <div id="tag-pills-list" class="tags-pill-track"></div>
+          <div class="tag-input-shell">
+            <input type="text" id="custom-tag-input" placeholder="+ Tag..." />
+          </div>
+        </div>
+
+        <div class="sliders-cluster">
+          <div class="custom-slider-unit" title="How risky/secret this info is.">
+            <div class="slider-head">
+              <div class="param-title-wrap">
+                <span class="param-name">Risk</span>
+              </div>
+              <span id="val-sensitivity" class="param-val">0.40</span>
+            </div>
+            <div class="slider-track-wrap">
+              <input type="range" id="sensitivity-slider" min="0" max="1" step="0.05" value="0.40" />
+            </div>
+          </div>
+
+          <div class="custom-slider-unit" title="How shocking or interesting the rumor is.">
+            <div class="slider-head">
+              <div class="param-title-wrap">
+                <span class="param-name">Virality</span>
+              </div>
+              <span id="val-virality" class="param-val">0.85</span>
+            </div>
+            <div class="slider-track-wrap">
+              <input type="range" id="virality-slider" min="0" max="1" step="0.05" value="0.85" />
+            </div>
+          </div>
+
+          <div class="custom-slider-unit" title="Hard evidence vs baseless rumor.">
+            <div class="slider-head">
+              <div class="param-title-wrap">
+                <span class="param-name">Proof</span>
+              </div>
+              <span id="val-verifiability" class="param-val">0.75</span>
+            </div>
+            <div class="slider-track-wrap">
+              <input type="range" id="verifiability-slider" min="0" max="1" step="0.05" value="0.75" />
+            </div>
+          </div>
+
+          <div id="unit-threshold" class="custom-slider-unit highlight-unit" title="Anomaly threshold for reverse-inferring missing transmission leaks.">
+            <div class="slider-head">
+              <div class="param-title-wrap">
+                <span class="param-name">Predict</span>
+              </div>
+              <span id="val-threshold" class="param-val">0.45</span>
+            </div>
+            <div class="slider-track-wrap">
+              <input type="range" id="threshold-slider" min="0.25" max="0.85" step="0.05" value="0.45" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INFERENCE OBSERVATION DECK (Active in Reverse Mode) -->
+      <div id="inference-observation-deck" class="hidden">
+        <span class="obs-label">Observed Nodes:</span>
+        <select id="incident-preset-select" class="custom-select" style="max-width: 250px;"></select>
+        <select id="obs-add-person-select" class="custom-select" style="max-width: 175px;"></select>
+        <div id="observed-chips-list" class="obs-track"></div>
+      </div>
+
+    </header>
+
+    <!-- NETWORK VIEWPORT -->
+    <main id="viewport-container">
+      <div id="cy-canvas"></div>
+
+      <!-- ACTIVE GRADIENT COLOR LEGEND BADGE -->
+      <div id="gradient-legend-badge">
+        <span id="legend-mode-title" class="legend-title">Spread Speed</span>
+        <div class="gradient-bar-wrapper">
+          <div id="legend-gradient-bar" class="gradient-bar"></div>
+          <div class="gradient-labels">
+            <span id="legend-min">Fast (0h)</span>
+            <span id="legend-mid"></span>
+            <span id="legend-max">Slow (24h+)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS HUD -->
+      <div id="summary-badge">
+        <div class="stat-unit">
+          <span class="lbl" id="hud-stat1-lbl">Informed</span>
+          <span id="stat-reached" class="val">0</span>
+        </div>
+        <div class="divider"></div>
+        <div class="stat-unit">
+          <span class="lbl" id="hud-stat2-lbl">Active Mode</span>
+          <span id="stat-links" class="val">Forward</span>
+        </div>
+        <div class="divider"></div>
+        <div class="stat-unit">
+          <span class="lbl">Avg Story Accuracy</span>
+          <span id="stat-fidelity" class="val">100%</span>
+        </div>
+      </div>
+
+      <!-- ON-SCREEN ERROR ALERT BANNER -->
+      <div id="error-banner" class="error-banner-card hidden">
+        <div class="error-header">
+          <div class="error-title-wrap">
+            <span class="error-icon">⚠</span>
+            <span class="error-title">SYSTEM EXCEPTION</span>
+          </div>
+          <button id="btn-dismiss-error" class="error-close-btn" title="Dismiss">✕</button>
+        </div>
+        <div id="error-message" class="error-msg-body">An unexpected engine error occurred.</div>
+        <div id="error-trace-container" class="error-trace-box hidden">
+          <pre id="error-trace"></pre>
+        </div>
+      </div>
+
+      <!-- INSPECTOR DRAWER -->
+      <aside id="inspector-drawer">
+        <div class="drawer-header">
+          <h2 id="inspector-title">Details</h2>
+          <span id="inspector-badge" class="badge">Click Entity</span>
+        </div>
+        <div id="inspector-body" class="drawer-content"></div>
+      </aside>
+    </main>
+
+    <!-- TIMELINE CONTROLLER & LEGEND (FOOTER) -->
+    <footer id="bottom-bar">
+      <div class="player-controls">
+        <button id="btn-play" class="btn-play">▶ Play</button>
+        <button id="btn-reset" class="btn-icon">↺</button>
+        <div class="counter"><span id="current-scrub-time">0.0</span><span class="unit">hrs</span></div>
+      </div>
+      <div class="slider-wrapper">
+        <input type="range" id="timeline-scrubber" min="0" max="24" step="0.1" value="0" />
+      </div>
+      <div class="legend-row">
+        <span class="chip" title="Originator node"><span class="dot origin"></span> Source</span>
+        <span class="chip" title="Information successfully delivered"><span class="dot active"></span> Reached</span>
+        <span class="chip" id="chip-predicted" title="Reverse-inferred hidden transmission link"><span class="dot predicted"></span> Predicted Link</span>
+        <span class="chip" title="Has not heard rumor yet"><span class="dot unreached"></span> Unreached</span>
+      </div>
+    </footer>
+
+    <!-- STUDIO NETWORK & SCENARIO EDITOR MODAL -->
+    <div id="editor-modal" class="modal-backdrop hidden">
+      <div class="studio-card">
+        <div class="studio-header">
+          <div class="studio-brand">
+            <span class="studio-dot"></span>
+            <h2>Network & Scenario Studio</h2>
+          </div>
+          <button id="btn-close-editor" class="btn-studio-close" title="Close">✕</button>
+        </div>
+
+        <div class="studio-tab-strip">
+          <button class="studio-tab active" data-tab="tab-scenarios">
+            <span class="tab-label">Scenarios</span>
+            <span class="tab-badge" id="badge-scenario-count">2</span>
+          </button>
+          <button class="studio-tab" data-tab="tab-people">
+            <span class="tab-label">People</span>
+            <span class="tab-badge" id="badge-people-count">7</span>
+          </button>
+          <button class="studio-tab" data-tab="tab-connections">
+            <span class="tab-label">Connections</span>
+            <span class="tab-badge" id="badge-conn-count">10</span>
+          </button>
+          <button class="studio-tab" data-tab="tab-io">
+            <span class="tab-label">Import / Export JSON</span>
+          </button>
+        </div>
+
+        <div class="studio-body">
+          <div id="tab-scenarios" class="studio-pane active">
+            <div class="split-layout">
+              <div class="list-column">
+                <div class="column-header">
+                  <span>Available Scenarios</span>
+                  <button id="btn-new-scenario-mode" class="btn-studio-add">+ New</button>
+                </div>
+                <div id="studio-scenarios-list" class="entity-list-scroll"></div>
+              </div>
+              <div class="form-column">
+                <div class="form-header">
+                  <h3>Create Scenario</h3>
+                  <p class="form-subtitle">Create a custom network environment.</p>
+                </div>
+                <div class="studio-form">
+                  <div class="field-block">
+                    <label>Scenario ID</label>
+                    <input type="text" id="new-scenario-id" class="studio-input" placeholder="e.g. startup_pitch" />
+                  </div>
+                  <div class="field-block">
+                    <label>Display Name</label>
+                    <input type="text" id="new-scenario-name" class="studio-input" placeholder="e.g. Early-Stage Startup" />
+                  </div>
+                  <div class="field-block">
+                    <label>Description</label>
+                    <textarea id="new-scenario-desc" class="studio-textarea" placeholder="Founders, investors, leaks..."></textarea>
+                  </div>
+                  <div class="form-footer">
+                    <button id="btn-create-scenario" class="btn-studio-primary">Create & Load Scenario</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-people" class="studio-pane">
+            <div class="split-layout">
+              <div class="list-column">
+                <div class="column-header">
+                  <span>People in Network</span>
+                </div>
+                <div id="studio-people-list" class="entity-list-scroll"></div>
+              </div>
+              <div class="form-column">
+                <div class="form-header">
+                  <h3>Add Person</h3>
+                  <p class="form-subtitle">Configure node demographics, crushes, and psychometrics.</p>
+                </div>
+                <div class="studio-form">
+                  <div class="form-grid-2">
+                    <div class="field-block">
+                      <label>Person ID</label>
+                      <input type="text" id="studio-person-id" class="studio-input" placeholder="e.g. dev_sarah" />
+                    </div>
+                    <div class="field-block">
+                      <label>Display Name</label>
+                      <input type="text" id="studio-person-name" class="studio-input" placeholder="e.g. Sarah" />
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2">
+                    <div class="field-block">
+                      <label>Gender</label>
+                      <select id="studio-person-gender" class="custom-select studio-select-full">
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Neutral">Neutral</option>
+                      </select>
+                    </div>
+                    <div class="field-block">
+                      <label>Age</label>
+                      <input type="number" id="studio-person-age" class="studio-input" value="22" min="14" max="99" />
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2">
+                    <div class="field-block">
+                      <label>Archetypes (Comma-separated)</label>
+                      <input type="text" id="studio-person-types" class="studio-input" placeholder="Social, Observer, Skeptic" />
+                    </div>
+                    <div class="field-block">
+                      <label>Crushes On (Person IDs)</label>
+                      <input type="text" id="studio-person-crush" class="studio-input" placeholder="e.g. lead_marcus" />
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2">
+                    <div class="field-block">
+                      <div class="field-header">
+                        <label>Talkative (Extraversion)</label>
+                        <span id="val-p-ext" class="field-val">0.75</span>
+                      </div>
+                      <input type="range" id="studio-p-ext" min="0" max="1" step="0.05" value="0.75" class="studio-slider" />
+                    </div>
+                    <div class="field-block">
+                      <div class="field-header">
+                        <label>Keeps Secrets (Discretion)</label>
+                        <span id="val-p-disc" class="field-val">0.50</span>
+                      </div>
+                      <input type="range" id="studio-p-disc" min="0" max="1" step="0.05" value="0.50" class="studio-slider" />
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2">
+                    <div class="field-block">
+                      <div class="field-header">
+                        <label>Needs Proof (Skepticism)</label>
+                        <span id="val-p-skep" class="field-val">0.70</span>
+                      </div>
+                      <input type="range" id="studio-p-skep" min="0" max="1" step="0.05" value="0.70" class="studio-slider" />
+                    </div>
+                    <div class="field-block">
+                      <div class="field-header">
+                        <label>Conformity (Fits In)</label>
+                        <span id="val-p-conf" class="field-val">0.60</span>
+                      </div>
+                      <input type="range" id="studio-p-conf" min="0" max="1" step="0.05" value="0.60" class="studio-slider" />
+                    </div>
+                  </div>
+
+                  <div class="form-footer">
+                    <button id="btn-studio-save-person" class="btn-studio-primary">Add Person to Network</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-connections" class="studio-pane">
+            <div class="split-layout">
+              <div class="list-column">
+                <div class="column-header">
+                  <span>Connections</span>
+                </div>
+                <div id="studio-conn-list" class="entity-list-scroll"></div>
+              </div>
+              <div class="form-column">
+                <div class="form-header">
+                  <h3>Add Relationship Channel</h3>
+                  <p class="form-subtitle">Define multi-channel bonds, trust, and behavioral flags.</p>
+                </div>
+                <div class="studio-form">
+                  <div class="form-grid-2">
+                    <div class="field-block">
+                      <label>Source (Speaker)</label>
+                      <select id="studio-conn-from" class="custom-select studio-select-full"></select>
+                    </div>
+                    <div class="field-block">
+                      <label>Target (Listener)</label>
+                      <select id="studio-conn-to" class="custom-select studio-select-full"></select>
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2">
+                    <div class="field-block">
+                      <label>Channel</label>
+                      <input type="text" id="studio-conn-ch" class="studio-input" value="InPerson" />
+                    </div>
+                    <div class="field-block">
+                      <div class="field-header">
+                        <label>Contact Regularity</label>
+                        <span id="val-c-freq" class="field-val">0.80</span>
+                      </div>
+                      <input type="range" id="studio-conn-strength" min="0.1" max="1.0" step="0.05" value="0.80" class="studio-slider" />
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2">
+                    <div class="field-block">
+                      <div class="field-header">
+                        <label>Speaker Trusts Listener</label>
+                        <span id="val-c-trust-s" class="field-val">0.80</span>
+                      </div>
+                      <input type="range" id="studio-conn-trust-s" min="0.1" max="1.0" step="0.05" value="0.80" class="studio-slider" />
+                    </div>
+                    <div class="field-block">
+                      <div class="field-header">
+                        <label>Listener Believes Speaker</label>
+                        <span id="val-c-trust-d" class="field-val">0.85</span>
+                      </div>
+                      <input type="range" id="studio-conn-trust-d" min="0.1" max="1.0" step="0.05" value="0.85" class="studio-slider" />
+                    </div>
+                  </div>
+
+                  <div class="field-block">
+                    <label>Flags (Space-separated)</label>
+                    <input type="text" id="studio-conn-flags" class="studio-input" placeholder="e.g. --StrictlyProfessional --ConfidentialPact --FastTrack" />
+                  </div>
+
+                  <div class="form-footer">
+                    <button id="btn-studio-save-conn" class="btn-studio-primary">Save Connection</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-io" class="studio-pane">
+            <div class="io-container">
+              <div class="io-header">
+                <div>
+                  <h3>Raw Network JSON</h3>
+                  <p class="form-subtitle">Export or import entire network configuration.</p>
+                </div>
+                <div class="io-actions">
+                  <button id="btn-studio-copy-json" class="btn-studio-secondary">Copy</button>
+                  <button id="btn-studio-export-json" class="btn-studio-secondary">Export JSON</button>
+                  <button id="btn-studio-import-json" class="btn-studio-primary">Import & Apply</button>
+                </div>
+              </div>
+              <textarea id="studio-io-area" class="studio-code-box" placeholder="Paste full network JSON here..."></textarea>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="js/components/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+#inspector-drawer {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  bottom: 14px;
+  width: 360px;
+  max-height: calc(100% - 28px);
+  background: rgba(21, 23, 24, 0.96);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 50;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.drawer-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  background: rgba(26, 29, 32, 0.9);
+}
+.drawer-header h2 {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.badge {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--bg-surface);
+  color: var(--accent-blue);
+  font-family: var(--font-mono);
+}
+
+/* Scrollable Container with Fixed Bottom Padding */
+.drawer-content {
+  padding: 14px 14px 50px 14px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  font-size: 11px;
+}
+
+/* Custom Sleek Scrollbar */
+.drawer-content::-webkit-scrollbar {
+  width: 5px;
+}
+.drawer-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+}
+.drawer-content::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+.drawer-content::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+.detail-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.detail-stat .lbl {
+  color: var(--text-dim);
+}
+.detail-stat .val {
+  font-family: var(--font-mono);
+}
+
+.log-box {
+  background: var(--bg-surface);
+  border-radius: 5px;
+  padding: 8px 10px;
+  margin-top: 4px;
+}
+
+.group-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  margin: 2px;
+}
+
+/* Friendship Cards */
+.friend-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.friend-card.predicted-card {
+  border-style: dashed;
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.04);
+}
+.friend-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.friend-name {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 12px;
+}
+.friend-status-badge {
+  font-size: 8px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+.friend-status-badge.predicted {
+  background: rgba(139, 92, 246, 0.18);
+  color: #c084fc;
+}
+
+/* Prediction Explanation Box */
+.prediction-reason-box {
+  background: rgba(139, 92, 246, 0.08);
+  border-left: 2px solid var(--accent-purple);
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-size: 9px;
+  color: #d8b4fe;
+  margin: 4px 0;
+  line-height: 1.3;
+}
+
+/* Channel Block with Contact Frequency & Explicit Trust */
+.channel-block {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+  padding: 5px 8px;
+  margin-top: 4px;
+}
+.channel-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-main);
+  font-weight: 500;
+}
+.channel-row .ch-level {
+  font-size: 9px;
+  color: var(--text-dim);
+}
+.channel-trust-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  padding-top: 3px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.05);
+}
+.channel-trust-sub span {
+  display: flex;
+  justify-content: space-between;
+}
+.channel-trust-sub strong {
+  font-family: var(--font-mono);
+  color: #e2e8f0;
+}

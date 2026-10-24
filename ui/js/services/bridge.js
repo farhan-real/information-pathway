@@ -1,5 +1,5 @@
 /**
- * PyWebView IPC Bridge with error propagation.
+ * PyWebView IPC Bridge.
  */
 
 function ensureBridgeReady() {
@@ -49,6 +49,12 @@ export async function listScenariosIPC() {
 export async function changeScenarioIPC(scenarioId) {
   await ensureBridgeReady();
   const raw = await window.pywebview.api.change_scenario(scenarioId);
+  return parseResponse(raw);
+}
+
+export async function getScenarioDetailsIPC(scenarioId) {
+  await ensureBridgeReady();
+  const raw = await window.pywebview.api.get_scenario_details(scenarioId);
   return parseResponse(raw);
 }
 

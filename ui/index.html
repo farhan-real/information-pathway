@@ -31,7 +31,6 @@
           <h1 class="logo">Information Pathway</h1>
         </div>
 
-        <!-- Mode Toggle -->
         <div class="mode-switch-wrapper">
           <button id="btn-mode-forward" class="mode-pill-btn active" title="Forward Simulation Mode">
             <span class="mode-icon">▶</span>
@@ -43,7 +42,6 @@
           </button>
         </div>
 
-        <!-- Routing Dropdowns -->
         <div class="routing-cluster">
           <div class="select-field">
             <span class="field-tag">SCENARIO</span>
@@ -63,7 +61,6 @@
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="action-cluster">
           <button id="btn-open-editor" class="btn-studio-edit" title="Open Network Studio">
             <span class="btn-icon">⚙</span>
@@ -106,9 +103,7 @@
         <div class="sliders-cluster">
           <div class="custom-slider-unit" title="How risky/secret this info is.">
             <div class="slider-head">
-              <div class="param-title-wrap">
-                <span class="param-name">Risk</span>
-              </div>
+              <div class="param-title-wrap"><span class="param-name">Risk</span></div>
               <span id="val-sensitivity" class="param-val">0.40</span>
             </div>
             <div class="slider-track-wrap">
@@ -118,9 +113,7 @@
 
           <div class="custom-slider-unit" title="How shocking or interesting the rumor is.">
             <div class="slider-head">
-              <div class="param-title-wrap">
-                <span class="param-name">Virality</span>
-              </div>
+              <div class="param-title-wrap"><span class="param-name">Virality</span></div>
               <span id="val-virality" class="param-val">0.85</span>
             </div>
             <div class="slider-track-wrap">
@@ -130,9 +123,7 @@
 
           <div class="custom-slider-unit" title="Hard evidence vs baseless rumor.">
             <div class="slider-head">
-              <div class="param-title-wrap">
-                <span class="param-name">Proof</span>
-              </div>
+              <div class="param-title-wrap"><span class="param-name">Proof</span></div>
               <span id="val-verifiability" class="param-val">0.75</span>
             </div>
             <div class="slider-track-wrap">
@@ -142,9 +133,7 @@
 
           <div id="unit-threshold" class="custom-slider-unit highlight-unit" title="Anomaly threshold for reverse-inferring missing transmission leaks.">
             <div class="slider-head">
-              <div class="param-title-wrap">
-                <span class="param-name">Predict</span>
-              </div>
+              <div class="param-title-wrap"><span class="param-name">Predict</span></div>
               <span id="val-threshold" class="param-val">0.45</span>
             </div>
             <div class="slider-track-wrap">
@@ -154,7 +143,7 @@
         </div>
       </div>
 
-      <!-- INFERENCE OBSERVATION DECK (Active in Reverse Mode) -->
+      <!-- INFERENCE OBSERVATION DECK -->
       <div id="inference-observation-deck" class="hidden">
         <span class="obs-label">Observed Nodes:</span>
         <select id="incident-preset-select" class="custom-select" style="max-width: 250px;"></select>
@@ -168,7 +157,6 @@
     <main id="viewport-container">
       <div id="cy-canvas"></div>
 
-      <!-- ACTIVE GRADIENT COLOR LEGEND BADGE -->
       <div id="gradient-legend-badge">
         <span id="legend-mode-title" class="legend-title">Spread Speed</span>
         <div class="gradient-bar-wrapper">
@@ -181,7 +169,6 @@
         </div>
       </div>
 
-      <!-- STATS HUD -->
       <div id="summary-badge">
         <div class="stat-unit">
           <span class="lbl" id="hud-stat1-lbl">Informed</span>
@@ -199,7 +186,6 @@
         </div>
       </div>
 
-      <!-- ON-SCREEN ERROR ALERT BANNER -->
       <div id="error-banner" class="error-banner-card hidden">
         <div class="error-header">
           <div class="error-title-wrap">
@@ -214,7 +200,6 @@
         </div>
       </div>
 
-      <!-- INSPECTOR DRAWER -->
       <aside id="inspector-drawer">
         <div class="drawer-header">
           <h2 id="inspector-title">Details</h2>
@@ -224,7 +209,7 @@
       </aside>
     </main>
 
-    <!-- TIMELINE CONTROLLER & LEGEND (FOOTER) -->
+    <!-- TIMELINE CONTROLLER (FOOTER) -->
     <footer id="bottom-bar">
       <div class="player-controls">
         <button id="btn-play" class="btn-play">▶ Play</button>
@@ -242,7 +227,7 @@
       </div>
     </footer>
 
-    <!-- STUDIO NETWORK & SCENARIO EDITOR MODAL -->
+    <!-- SCENARIO-CENTRIC NETWORK STUDIO MODAL -->
     <div id="editor-modal" class="modal-backdrop hidden">
       <div class="studio-card">
         <div class="studio-header">
@@ -253,236 +238,210 @@
           <button id="btn-close-editor" class="btn-studio-close" title="Close">✕</button>
         </div>
 
-        <div class="studio-tab-strip">
-          <button class="studio-tab active" data-tab="tab-scenarios">
-            <span class="tab-label">Scenarios</span>
-            <span class="tab-badge" id="badge-scenario-count">2</span>
-          </button>
-          <button class="studio-tab" data-tab="tab-people">
-            <span class="tab-label">People</span>
-            <span class="tab-badge" id="badge-people-count">7</span>
-          </button>
-          <button class="studio-tab" data-tab="tab-connections">
-            <span class="tab-label">Connections</span>
-            <span class="tab-badge" id="badge-conn-count">10</span>
-          </button>
-          <button class="studio-tab" data-tab="tab-io">
-            <span class="tab-label">Import / Export JSON</span>
-          </button>
-        </div>
+        <div class="studio-scenario-container">
+          
+          <!-- LEFT SIDEBAR: SCENARIOS LIST -->
+          <div class="studio-scenario-sidebar">
+            <div class="sidebar-top">
+              <span class="sidebar-heading">Scenarios</span>
+              <button id="btn-new-scenario-mode" class="btn-scenario-new">+ New Scenario</button>
+            </div>
+            <div id="studio-scenarios-list" class="sidebar-scenario-scroll"></div>
+          </div>
 
-        <div class="studio-body">
-          <div id="tab-scenarios" class="studio-pane active">
-            <div class="split-layout">
-              <div class="list-column">
-                <div class="column-header">
-                  <span>Available Scenarios</span>
-                  <button id="btn-new-scenario-mode" class="btn-studio-add">+ New</button>
-                </div>
-                <div id="studio-scenarios-list" class="entity-list-scroll"></div>
+          <!-- RIGHT WORKSPACE: ACTIVE SCENARIO CONTAINER -->
+          <div id="scenario-workspace" class="studio-scenario-workspace">
+            
+            <!-- HEADER OF THE CURRENT SCENARIO -->
+            <div class="workspace-scenario-header">
+              <div class="workspace-title-wrap">
+                <h3 id="current-scenario-title">Scenario Workspace</h3>
+                <p id="current-scenario-desc" class="workspace-desc">Scenario description and configuration.</p>
               </div>
-              <div class="form-column">
-                <div class="form-header">
-                  <h3>Create Scenario</h3>
-                  <p class="form-subtitle">Create a custom network environment.</p>
-                </div>
-                <div class="studio-form">
-                  <div class="field-block">
-                    <label>Scenario ID</label>
-                    <input type="text" id="new-scenario-id" class="studio-input" placeholder="e.g. startup_pitch" />
+              <button id="btn-activate-scenario" class="btn-studio-primary">Load into Canvas</button>
+            </div>
+
+            <!-- INNER SUB-TABS CONTAINED WITHIN THIS SCENARIO -->
+            <div class="scenario-inner-tabs">
+              <button class="inner-tab active" data-tab="scenario-people-pane">
+                <span>People</span>
+                <span id="badge-people-count" class="tab-badge">0</span>
+              </button>
+              <button class="inner-tab" data-tab="scenario-connections-pane">
+                <span>Connections</span>
+                <span id="badge-conn-count" class="tab-badge">0</span>
+              </button>
+              <button class="inner-tab" data-tab="scenario-io-pane">
+                <span>Scenario JSON</span>
+              </button>
+            </div>
+
+            <!-- WORKSPACE PANES -->
+            <div class="workspace-panes-body">
+              
+              <!-- 1. PEOPLE INSIDE THIS SCENARIO -->
+              <div id="scenario-people-pane" class="workspace-pane active">
+                <div class="pane-split">
+                  <div class="pane-list-col">
+                    <span class="col-title">People in this Scenario</span>
+                    <div id="studio-people-list" class="entity-list-scroll"></div>
                   </div>
-                  <div class="field-block">
-                    <label>Display Name</label>
-                    <input type="text" id="new-scenario-name" class="studio-input" placeholder="e.g. Early-Stage Startup" />
-                  </div>
-                  <div class="field-block">
-                    <label>Description</label>
-                    <textarea id="new-scenario-desc" class="studio-textarea" placeholder="Founders, investors, leaks..."></textarea>
-                  </div>
-                  <div class="form-footer">
-                    <button id="btn-create-scenario" class="btn-studio-primary">Create & Load Scenario</button>
+                  <div class="pane-form-col">
+                    <span class="col-title">+ Add Person to this Scenario</span>
+                    <div class="studio-form">
+                      <div class="form-grid-2">
+                        <div class="field-block">
+                          <label>ID</label>
+                          <input type="text" id="studio-person-id" class="studio-input" placeholder="e.g. dev_sarah" />
+                        </div>
+                        <div class="field-block">
+                          <label>Name</label>
+                          <input type="text" id="studio-person-name" class="studio-input" placeholder="e.g. Sarah" />
+                        </div>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="field-block">
+                          <label>Gender</label>
+                          <select id="studio-person-gender" class="custom-select studio-select-full">
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Neutral">Neutral</option>
+                          </select>
+                        </div>
+                        <div class="field-block">
+                          <label>Age</label>
+                          <input type="number" id="studio-person-age" class="studio-input" value="22" min="14" max="99" />
+                        </div>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="field-block">
+                          <label>Archetypes (Comma-separated)</label>
+                          <input type="text" id="studio-person-types" class="studio-input" placeholder="Social, Observer, Skeptic" />
+                        </div>
+                        <div class="field-block">
+                          <label>Crushes On (IDs)</label>
+                          <input type="text" id="studio-person-crush" class="studio-input" placeholder="e.g. lead_marcus" />
+                        </div>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="field-block">
+                          <div class="field-header"><label>Extraversion</label><span id="val-p-ext" class="field-val">0.75</span></div>
+                          <input type="range" id="studio-p-ext" min="0" max="1" step="0.05" value="0.75" class="studio-slider" />
+                        </div>
+                        <div class="field-block">
+                          <div class="field-header"><label>Discretion</label><span id="val-p-disc" class="field-val">0.50</span></div>
+                          <input type="range" id="studio-p-disc" min="0" max="1" step="0.05" value="0.50" class="studio-slider" />
+                        </div>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="field-block">
+                          <div class="field-header"><label>Skepticism</label><span id="val-p-skep" class="field-val">0.70</span></div>
+                          <input type="range" id="studio-p-skep" min="0" max="1" step="0.05" value="0.70" class="studio-slider" />
+                        </div>
+                        <div class="field-block">
+                          <div class="field-header"><label>Conformity</label><span id="val-p-conf" class="field-val">0.60</span></div>
+                          <input type="range" id="studio-p-conf" min="0" max="1" step="0.05" value="0.60" class="studio-slider" />
+                        </div>
+                      </div>
+                      <button id="btn-studio-save-person" class="btn-studio-primary" style="margin-top:6px;">Add Person</button>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              <!-- 2. CONNECTIONS INSIDE THIS SCENARIO -->
+              <div id="scenario-connections-pane" class="workspace-pane">
+                <div class="pane-split">
+                  <div class="pane-list-col">
+                    <span class="col-title">Connections in this Scenario</span>
+                    <div id="studio-conn-list" class="entity-list-scroll"></div>
+                  </div>
+                  <div class="pane-form-col">
+                    <span class="col-title">+ Add Relationship Channel</span>
+                    <div class="studio-form">
+                      <div class="form-grid-2">
+                        <div class="field-block">
+                          <label>Source (Speaker)</label>
+                          <select id="studio-conn-from" class="custom-select studio-select-full"></select>
+                        </div>
+                        <div class="field-block">
+                          <label>Target (Listener)</label>
+                          <select id="studio-conn-to" class="custom-select studio-select-full"></select>
+                        </div>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="field-block">
+                          <label>Channel</label>
+                          <input type="text" id="studio-conn-ch" class="studio-input" value="InPerson" />
+                        </div>
+                        <div class="field-block">
+                          <div class="field-header"><label>Strength</label><span id="val-c-freq" class="field-val">0.80</span></div>
+                          <input type="range" id="studio-conn-strength" min="0.1" max="1.0" step="0.05" value="0.80" class="studio-slider" />
+                        </div>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="field-block">
+                          <div class="field-header"><label>Speaker Trusts Listener</label><span id="val-c-trust-s" class="field-val">0.80</span></div>
+                          <input type="range" id="studio-conn-trust-s" min="0.1" max="1.0" step="0.05" value="0.80" class="studio-slider" />
+                        </div>
+                        <div class="field-block">
+                          <div class="field-header"><label>Listener Believes Speaker</label><span id="val-c-trust-d" class="field-val">0.85</span></div>
+                          <input type="range" id="studio-conn-trust-d" min="0.1" max="1.0" step="0.05" value="0.85" class="studio-slider" />
+                        </div>
+                      </div>
+                      <div class="field-block">
+                        <label>Flags (Space-separated)</label>
+                        <input type="text" id="studio-conn-flags" class="studio-input" placeholder="e.g. --StrictlyProfessional --ConfidentialPact --FastTrack" />
+                      </div>
+                      <button id="btn-studio-save-conn" class="btn-studio-primary" style="margin-top:6px;">Add Connection</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. SCENARIO JSON CONFIG -->
+              <div id="scenario-io-pane" class="workspace-pane">
+                <div class="io-container">
+                  <div class="io-header">
+                    <span class="col-title">Configuration JSON for this Scenario</span>
+                    <div class="io-actions">
+                      <button id="btn-studio-copy-json" class="btn-studio-secondary">Copy</button>
+                      <button id="btn-studio-export-json" class="btn-studio-secondary">Export</button>
+                      <button id="btn-studio-import-json" class="btn-studio-primary">Import & Apply</button>
+                    </div>
+                  </div>
+                  <textarea id="studio-io-area" class="studio-code-box" placeholder="Scenario JSON configuration..."></textarea>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <div id="tab-people" class="studio-pane">
-            <div class="split-layout">
-              <div class="list-column">
-                <div class="column-header">
-                  <span>People in Network</span>
-                </div>
-                <div id="studio-people-list" class="entity-list-scroll"></div>
+          <!-- CREATE SCENARIO FORM (Only shown when + New Scenario is clicked) -->
+          <div id="create-scenario-panel" class="studio-scenario-workspace hidden">
+            <div class="workspace-scenario-header">
+              <div class="workspace-title-wrap">
+                <h3>Create New Scenario</h3>
+                <p class="workspace-desc">Initialize a new network environment with custom members and dynamics.</p>
               </div>
-              <div class="form-column">
-                <div class="form-header">
-                  <h3>Add Person</h3>
-                  <p class="form-subtitle">Configure node demographics, crushes, and psychometrics.</p>
-                </div>
-                <div class="studio-form">
-                  <div class="form-grid-2">
-                    <div class="field-block">
-                      <label>Person ID</label>
-                      <input type="text" id="studio-person-id" class="studio-input" placeholder="e.g. dev_sarah" />
-                    </div>
-                    <div class="field-block">
-                      <label>Display Name</label>
-                      <input type="text" id="studio-person-name" class="studio-input" placeholder="e.g. Sarah" />
-                    </div>
-                  </div>
-
-                  <div class="form-grid-2">
-                    <div class="field-block">
-                      <label>Gender</label>
-                      <select id="studio-person-gender" class="custom-select studio-select-full">
-                        <option value="Female">Female</option>
-                        <option value="Male">Male</option>
-                        <option value="Neutral">Neutral</option>
-                      </select>
-                    </div>
-                    <div class="field-block">
-                      <label>Age</label>
-                      <input type="number" id="studio-person-age" class="studio-input" value="22" min="14" max="99" />
-                    </div>
-                  </div>
-
-                  <div class="form-grid-2">
-                    <div class="field-block">
-                      <label>Archetypes (Comma-separated)</label>
-                      <input type="text" id="studio-person-types" class="studio-input" placeholder="Social, Observer, Skeptic" />
-                    </div>
-                    <div class="field-block">
-                      <label>Crushes On (Person IDs)</label>
-                      <input type="text" id="studio-person-crush" class="studio-input" placeholder="e.g. lead_marcus" />
-                    </div>
-                  </div>
-
-                  <div class="form-grid-2">
-                    <div class="field-block">
-                      <div class="field-header">
-                        <label>Talkative (Extraversion)</label>
-                        <span id="val-p-ext" class="field-val">0.75</span>
-                      </div>
-                      <input type="range" id="studio-p-ext" min="0" max="1" step="0.05" value="0.75" class="studio-slider" />
-                    </div>
-                    <div class="field-block">
-                      <div class="field-header">
-                        <label>Keeps Secrets (Discretion)</label>
-                        <span id="val-p-disc" class="field-val">0.50</span>
-                      </div>
-                      <input type="range" id="studio-p-disc" min="0" max="1" step="0.05" value="0.50" class="studio-slider" />
-                    </div>
-                  </div>
-
-                  <div class="form-grid-2">
-                    <div class="field-block">
-                      <div class="field-header">
-                        <label>Needs Proof (Skepticism)</label>
-                        <span id="val-p-skep" class="field-val">0.70</span>
-                      </div>
-                      <input type="range" id="studio-p-skep" min="0" max="1" step="0.05" value="0.70" class="studio-slider" />
-                    </div>
-                    <div class="field-block">
-                      <div class="field-header">
-                        <label>Conformity (Fits In)</label>
-                        <span id="val-p-conf" class="field-val">0.60</span>
-                      </div>
-                      <input type="range" id="studio-p-conf" min="0" max="1" step="0.05" value="0.60" class="studio-slider" />
-                    </div>
-                  </div>
-
-                  <div class="form-footer">
-                    <button id="btn-studio-save-person" class="btn-studio-primary">Add Person to Network</button>
-                  </div>
-                </div>
-              </div>
+              <button id="btn-cancel-create-sc" class="btn-studio-secondary">Cancel</button>
             </div>
-          </div>
-
-          <div id="tab-connections" class="studio-pane">
-            <div class="split-layout">
-              <div class="list-column">
-                <div class="column-header">
-                  <span>Connections</span>
+            <div style="padding: 24px;">
+              <div class="studio-form" style="max-width: 480px;">
+                <div class="field-block">
+                  <label>Scenario ID</label>
+                  <input type="text" id="new-scenario-id" class="studio-input" placeholder="e.g. medical_research" />
                 </div>
-                <div id="studio-conn-list" class="entity-list-scroll"></div>
+                <div class="field-block">
+                  <label>Display Name</label>
+                  <input type="text" id="new-scenario-name" class="studio-input" placeholder="e.g. Hospital Research Ward" />
+                </div>
+                <div class="field-block">
+                  <label>Description</label>
+                  <textarea id="new-scenario-desc" class="studio-textarea" placeholder="Clinical staff, ethics leaks, hierarchy..."></textarea>
+                </div>
+                <button id="btn-create-scenario" class="btn-studio-primary" style="margin-top: 10px;">Create Scenario</button>
               </div>
-              <div class="form-column">
-                <div class="form-header">
-                  <h3>Add Relationship Channel</h3>
-                  <p class="form-subtitle">Define multi-channel bonds, trust, and behavioral flags.</p>
-                </div>
-                <div class="studio-form">
-                  <div class="form-grid-2">
-                    <div class="field-block">
-                      <label>Source (Speaker)</label>
-                      <select id="studio-conn-from" class="custom-select studio-select-full"></select>
-                    </div>
-                    <div class="field-block">
-                      <label>Target (Listener)</label>
-                      <select id="studio-conn-to" class="custom-select studio-select-full"></select>
-                    </div>
-                  </div>
-
-                  <div class="form-grid-2">
-                    <div class="field-block">
-                      <label>Channel</label>
-                      <input type="text" id="studio-conn-ch" class="studio-input" value="InPerson" />
-                    </div>
-                    <div class="field-block">
-                      <div class="field-header">
-                        <label>Contact Regularity</label>
-                        <span id="val-c-freq" class="field-val">0.80</span>
-                      </div>
-                      <input type="range" id="studio-conn-strength" min="0.1" max="1.0" step="0.05" value="0.80" class="studio-slider" />
-                    </div>
-                  </div>
-
-                  <div class="form-grid-2">
-                    <div class="field-block">
-                      <div class="field-header">
-                        <label>Speaker Trusts Listener</label>
-                        <span id="val-c-trust-s" class="field-val">0.80</span>
-                      </div>
-                      <input type="range" id="studio-conn-trust-s" min="0.1" max="1.0" step="0.05" value="0.80" class="studio-slider" />
-                    </div>
-                    <div class="field-block">
-                      <div class="field-header">
-                        <label>Listener Believes Speaker</label>
-                        <span id="val-c-trust-d" class="field-val">0.85</span>
-                      </div>
-                      <input type="range" id="studio-conn-trust-d" min="0.1" max="1.0" step="0.05" value="0.85" class="studio-slider" />
-                    </div>
-                  </div>
-
-                  <div class="field-block">
-                    <label>Flags (Space-separated)</label>
-                    <input type="text" id="studio-conn-flags" class="studio-input" placeholder="e.g. --StrictlyProfessional --ConfidentialPact --FastTrack" />
-                  </div>
-
-                  <div class="form-footer">
-                    <button id="btn-studio-save-conn" class="btn-studio-primary">Save Connection</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div id="tab-io" class="studio-pane">
-            <div class="io-container">
-              <div class="io-header">
-                <div>
-                  <h3>Raw Network JSON</h3>
-                  <p class="form-subtitle">Export or import entire network configuration.</p>
-                </div>
-                <div class="io-actions">
-                  <button id="btn-studio-copy-json" class="btn-studio-secondary">Copy</button>
-                  <button id="btn-studio-export-json" class="btn-studio-secondary">Export JSON</button>
-                  <button id="btn-studio-import-json" class="btn-studio-primary">Import & Apply</button>
-                </div>
-              </div>
-              <textarea id="studio-io-area" class="studio-code-box" placeholder="Paste full network JSON here..."></textarea>
             </div>
           </div>
 

@@ -27,6 +27,13 @@ class AppBridge:
         except Exception as e:
             return self._handle_error(e)
 
+    def get_scenario_details(self, scenario_id: str):
+        try:
+            meta = self.service.get_scenario_metadata(scenario_id)
+            return json.dumps(meta)
+        except Exception as e:
+            return self._handle_error(e)
+
     def create_scenario(self, scenario_json: str):
         try:
             data = json.loads(scenario_json)

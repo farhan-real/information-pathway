@@ -4,30 +4,48 @@ import {
   createScenarioIPC,
   deleteScenarioIPC,
   deletePersonIPC,
-  deleteConnectionIPC
+  deleteConnectionIPC,
+  getScenarioDetailsIPC
 } from '../services/bridge.js';
+
+let inspectedScenarioId = null;
 
 export function initEditorModal(onNetworkChanged) {
   const modal = document.getElementById('editor-modal');
   const btnOpen = document.getElementById('btn-open-editor');
   const btnClose = document.getElementById('btn-close-editor');
-  const tabs = document.querySelectorAll('.studio-tab');
-  const panes = document.querySelectorAll('.studio-pane');
+  const innerTabs = document.querySelectorAll('.inner-tab');
+  const innerPanes = document.querySelectorAll('.workspace-pane');
+  const btnNewSc = document.getElementById('btn-new-scenario-mode');
+  const btnCancelCreate = document.getElementById('btn-cancel-create-sc');
 
   btnOpen.onclick = async () => {
-    await refreshStudioData();
+    inspectedScenarioId = document.getElementById('scenario-select').value;
+    await refreshStudioView();
     modal.classList.remove('hidden');
   };
   btnClose.onclick = () => modal.classList.add('hidden');
 
-  tabs.forEach(tab => {
+  // Inner Sub-Tab Switching (Contained inside this scenario)
+  innerTabs.forEach(tab => {
     tab.onclick = () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      panes.forEach(p => p.classList.remove('active'));
+      innerTabs.forEach(t => t.classList.remove('active'));
+      innerPanes.forEach(p => p.classList.remove('active'));
       tab.classList.add('active');
-      document.getElementById(tab.dataset.tab).classList.add('active');
+      const targetPane = document.getElementById(tab.dataset.tab);
+      if (targetPane) targetPane.classList.add('active');
     };
   });
+
+  // Switch between Scenario Workspace and Create Scenario Panel
+  btnNewSc.onclick = () => {
+    document.getElementById('scenario-workspace').classList.add('hidden');
+    document.getElementById('create-scenario-panel').classList.remove('hidden');
+  };
+  btnCancelCreate.onclick = () => {
+    document.getElementById('create-scenario-panel').classList.add('hidden');
+    document.getElementById('scenario-workspace').classList.remove('hidden');
+  };
 
   syncSlider('studio-p-ext', 'val-p-ext');
   syncSlider('studio-p-disc', 'val-p-disc');
@@ -37,6 +55,17 @@ export function initEditorModal(onNetworkChanged) {
   syncSlider('studio-conn-trust-s', 'val-c-trust-s');
   syncSlider('studio-conn-trust-d', 'val-c-trust-d');
 
+  // Activate Scenario from Studio into Main Canvas
+  document.getElementById('btn-activate-scenario').onclick = async () => {
+    if (inspectedScenarioId) {
+      document.getElementById('scenario-select').value = inspectedScenarioId;
+      document.getElementById('scenario-select').dispatchEvent(new Event('change'));
+      await refreshStudioView();
+      if (onNetworkChanged) onNetworkChanged(inspectedScenarioId);
+    }
+  };
+
+  // Create Scenario
   document.getElementById('btn-create-scenario').onclick = async () => {
     const id = document.getElementById('new-scenario-id').value.trim();
     const name = document.getElementById('new-scenario-name').value.trim();
@@ -44,13 +73,18 @@ export function initEditorModal(onNetworkChanged) {
     if (!id || !name) return alert("Please enter both an ID and Name.");
 
     await createScenarioIPC({ id, name, description: desc });
+    inspectedScenarioId = id;
     document.getElementById('new-scenario-id').value = "";
     document.getElementById('new-scenario-name').value = "";
     document.getElementById('new-scenario-desc').value = "";
-    await refreshStudioData();
+
+    document.getElementById('create-scenario-panel').classList.add('hidden');
+    document.getElementById('scenario-workspace').classList.remove('hidden');
+    await refreshStudioView();
     if (onNetworkChanged) onNetworkChanged(id);
   };
 
+  // Add Person to THIS Scenario
   document.getElementById('btn-studio-save-person').onclick = async () => {
     const id = document.getElementById('studio-person-id').value.trim();
     const name = document.getElementById('studio-person-name').value.trim();
@@ -70,19 +104,19 @@ export function initEditorModal(onNetworkChanged) {
         accuracy: 0.85, retention: 0.85,
         conformity: parseFloat(document.getElementById('studio-p-conf').value)
       },
-      schedule: { tier: 1 },
-      groups: {}
+      schedule: { tier: 1 }, groups: {}
     };
 
     if (window.pywebview?.api) {
       await window.pywebview.api.add_person(JSON.stringify(person));
       document.getElementById('studio-person-id').value = "";
       document.getElementById('studio-person-name').value = "";
-      await refreshStudioData();
-      if (onNetworkChanged) onNetworkChanged();
+      await refreshStudioView();
+      if (onNetworkChanged) onNetworkChanged(inspectedScenarioId);
     }
   };
 
+  // Add Connection to THIS Scenario
   document.getElementById('btn-studio-save-conn').onclick = async () => {
     const source = document.getElementById('studio-conn-from').value;
     const target = document.getElementById('studio-conn-to').value;
@@ -96,137 +130,117 @@ export function initEditorModal(onNetworkChanged) {
 
     const conn = {
       source, target,
-      channels: {
-        [chName]: { strength, level: "Best", trust_stod: trustS, trust_dtos: trustD, active_hours: 8 }
-      },
+      channels: { [chName]: { strength, level: "Best", trust_stod: trustS, trust_dtos: trustD, active_hours: 8 } },
       flags
     };
 
     if (window.pywebview?.api) {
       await window.pywebview.api.add_connection(JSON.stringify(conn));
-      await refreshStudioData();
-      if (onNetworkChanged) onNetworkChanged();
+      await refreshStudioView();
+      if (onNetworkChanged) onNetworkChanged(inspectedScenarioId);
     }
   };
 
+  // JSON Management
   document.getElementById('btn-studio-export-json').onclick = async () => {
     if (window.pywebview?.api) {
       const jsonStr = await window.pywebview.api.export_config();
       document.getElementById('studio-io-area').value = jsonStr;
     }
   };
-
   document.getElementById('btn-studio-copy-json').onclick = () => {
     const area = document.getElementById('studio-io-area');
     area.select();
     navigator.clipboard.writeText(area.value);
-    alert("Network JSON copied to clipboard!");
+    alert("Scenario JSON copied to clipboard!");
   };
-
   document.getElementById('btn-studio-import-json').onclick = async () => {
     const jsonStr = document.getElementById('studio-io-area').value.trim();
-    if (!jsonStr) return alert("Please paste valid network JSON first.");
-
+    if (!jsonStr) return alert("Please paste valid scenario JSON first.");
     if (window.pywebview?.api) {
-      try {
-        await window.pywebview.api.import_config(jsonStr);
-        await refreshStudioData();
-        modal.classList.add('hidden');
-        if (onNetworkChanged) onNetworkChanged();
-      } catch (err) {
-        alert("Failed to import network JSON: " + err);
-      }
+      await window.pywebview.api.import_config(jsonStr);
+      await refreshStudioView();
+      if (onNetworkChanged) onNetworkChanged();
     }
   };
 }
 
-async function refreshStudioData() {
-  const currentScenarioId = document.getElementById('scenario-select').value;
-  const meta = await changeScenarioIPC(currentScenarioId);
+async function refreshStudioView() {
+  const activeScenarioId = document.getElementById('scenario-select').value;
+  if (!inspectedScenarioId) inspectedScenarioId = activeScenarioId;
 
-  // 1. Scenarios List
+  // 1. Render Scenarios Sidebar
   const scenarios = await listScenariosIPC();
   const scenariosList = document.getElementById('studio-scenarios-list');
-  document.getElementById('badge-scenario-count').textContent = scenarios.length;
-
-  scenariosList.innerHTML = scenarios.map(s => `
-    <div class="entity-item-card ${s.id === currentScenarioId ? 'current' : ''}">
-      <div class="entity-info" style="cursor: pointer;" onclick="document.getElementById('scenario-select').value='${s.id}'; document.getElementById('scenario-select').dispatchEvent(new Event('change'));">
-        <span class="entity-title">${s.name}</span>
-        <span class="entity-sub">${s.nodes_count} nodes • ${s.edges_count} links</span>
+  scenariosList.innerHTML = scenarios.map(s => {
+    const isInspected = s.id === inspectedScenarioId;
+    const isLive = s.id === activeScenarioId;
+    return `
+      <div class="scenario-nav-card ${isInspected ? 'active-card' : ''}" data-id="${s.id}">
+        <span class="scenario-nav-title">${s.name} ${isLive ? '<span style="color:#60a5fa; font-size:9px;">(Live)</span>' : ''}</span>
+        <span class="scenario-nav-sub">${s.nodes_count} people · ${s.edges_count} links</span>
       </div>
-      <div class="entity-actions">
-        ${s.id !== currentScenarioId ? `<button class="btn-studio-action select-sc" data-id="${s.id}" title="Activate">Select</button>` : '<span class="badge active-badge">Active</span>'}
-        ${scenarios.length > 1 ? `<button class="btn-studio-action delete del-sc" data-id="${s.id}" title="Delete">✕</button>` : ''}
-      </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 
-  document.querySelectorAll('.select-sc').forEach(btn => {
-    btn.onclick = async () => {
-      document.getElementById('scenario-select').value = btn.dataset.id;
-      document.getElementById('scenario-select').dispatchEvent(new Event('change'));
-      await refreshStudioData();
+  document.querySelectorAll('.scenario-nav-card').forEach(card => {
+    card.onclick = async () => {
+      inspectedScenarioId = card.dataset.id;
+      document.getElementById('create-scenario-panel').classList.add('hidden');
+      document.getElementById('scenario-workspace').classList.remove('hidden');
+      await refreshStudioView();
     };
   });
 
-  document.querySelectorAll('.del-sc').forEach(btn => {
-    btn.onclick = async () => {
-      if (confirm(`Delete scenario "${btn.dataset.id}"?`)) {
-        await deleteScenarioIPC(btn.dataset.id);
-        document.getElementById('scenario-select').dispatchEvent(new Event('change'));
-        await refreshStudioData();
-      }
-    };
-  });
+  // 2. Fetch Inspected Scenario's Metadata
+  const meta = await getScenarioDetailsIPC(inspectedScenarioId);
+  document.getElementById('current-scenario-title').textContent = meta.name;
+  document.getElementById('current-scenario-desc').textContent = meta.description || "Scenario configuration and members.";
 
-  // 2. People List
+  const btnActivate = document.getElementById('btn-activate-scenario');
+  if (inspectedScenarioId === activeScenarioId) {
+    btnActivate.textContent = "Loaded in Canvas";
+    btnActivate.style.opacity = "0.6";
+  } else {
+    btnActivate.textContent = "Load into Canvas";
+    btnActivate.style.opacity = "1.0";
+  }
+
+  // 3. Render People Inside This Scenario
   const people = meta.nodes || [];
-  const peopleList = document.getElementById('studio-people-list');
   document.getElementById('badge-people-count').textContent = people.length;
-
-  peopleList.innerHTML = people.map(p => `
+  document.getElementById('studio-people-list').innerHTML = people.map(p => `
     <div class="entity-item-card">
-      <div class="entity-info">
-        <span class="entity-title">${p.name}</span>
-        <span class="entity-sub">ID: ${p.id}</span>
-      </div>
-      <button class="btn-studio-action delete del-p" data-id="${p.id}" title="Delete Person">✕</button>
+      <div class="entity-info"><span class="entity-title">${p.name}</span><span class="entity-sub">ID: ${p.id}</span></div>
+      <button class="btn-studio-action delete del-p" data-id="${p.id}" title="Delete">✕</button>
     </div>
-  `).join("");
+  `).join("") || `<div style="color:#64748b; font-size:10px; padding:10px;">No people in this scenario.</div>`;
 
   document.querySelectorAll('.del-p').forEach(btn => {
     btn.onclick = async () => {
-      if (confirm(`Delete ${btn.dataset.id} from network?`)) {
-        await deletePersonIPC(btn.dataset.id);
-        await refreshStudioData();
-      }
+      await deletePersonIPC(btn.dataset.id);
+      await refreshStudioView();
     };
   });
 
-  // 3. Connections List
+  // 4. Render Connections Inside This Scenario
   const connections = meta.edges || [];
-  const connList = document.getElementById('studio-conn-list');
   document.getElementById('badge-conn-count').textContent = connections.length;
-
-  connList.innerHTML = connections.map(c => `
+  document.getElementById('studio-conn-list').innerHTML = connections.map(c => `
     <div class="entity-item-card">
-      <div class="entity-info">
-        <span class="entity-title">${c.source} → ${c.target}</span>
-        <span class="entity-sub">Channel: ${Object.keys(c.channels)[0] || 'Direct'}</span>
-      </div>
-      <button class="btn-studio-action delete del-conn" data-u="${c.source}" data-v="${c.target}" title="Delete Connection">✕</button>
+      <div class="entity-info"><span class="entity-title">${c.source} → ${c.target}</span><span class="entity-sub">Via: ${Object.keys(c.channels || {})[0] || 'Direct'}</span></div>
+      <button class="btn-studio-action delete del-conn" data-u="${c.source}" data-v="${c.target}" title="Delete">✕</button>
     </div>
-  `).join("") || `<div style="color:#64748b; font-size:11px; padding:12px;">No connections in this scenario.</div>`;
+  `).join("") || `<div style="color:#64748b; font-size:10px; padding:10px;">No connections in this scenario.</div>`;
 
   document.querySelectorAll('.del-conn').forEach(btn => {
     btn.onclick = async () => {
       await deleteConnectionIPC(btn.dataset.u, btn.dataset.v);
-      await refreshStudioData();
+      await refreshStudioView();
     };
   });
 
-  // Dropdowns for connection modal
+  // Dropdowns for connection form
   const fromSel = document.getElementById('studio-conn-from');
   const toSel = document.getElementById('studio-conn-to');
   fromSel.innerHTML = people.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
@@ -234,9 +248,6 @@ async function refreshStudioData() {
 }
 
 function syncSlider(sliderId, labelId) {
-  const s = document.getElementById(sliderId);
-  const l = document.getElementById(labelId);
-  s.oninput = (e) => {
-    l.textContent = parseFloat(e.target.value).toFixed(2);
-  };
+  const s = document.getElementById(sliderId), l = document.getElementById(labelId);
+  s.oninput = (e) => { l.textContent = parseFloat(e.target.value).toFixed(2); };
 }

@@ -31,9 +31,9 @@ class SimulationService:
         return {
             "id": sc["id"], "name": sc["name"], "description": sc["description"],
             "topics": sc.get("topics", []), "incidents": sc.get("incidents", []),
-            "groups": self.gm.groups,
-            "nodes": [{"id": nid, "name": d["name"]} for nid, d in self.gm.graph.nodes(data=True)],
-            "edges": [{"source": u, "target": v, "channels": d.get("channels", {})} for u, v, d in self.gm.graph.edges(data=True)]
+            "groups": sc.get("groups", {}),
+            "nodes": [{"id": n["id"], "name": n["name"]} for n in sc.get("nodes", [])],
+            "edges": [{"source": e["source"], "target": e["target"], "channels": e.get("channels", {})} for e in sc.get("edges", [])]
         }
 
     def change_scenario(self, scenario_id: str) -> Dict[str, Any]:
@@ -53,41 +53,45 @@ class SimulationService:
             return True
         return False
 
-    def add_custom_person(self, person_data: dict):
-        self.store.add_node(self.current_scenario_id, person_data)
-        self.gm.add_person(
-            person_id=person_data["id"], name=person_data["name"],
-            psychometrics=person_data.get("psychometrics", {}),
-            schedule=person_data.get("schedule", {"tier": 1}),
-            group_memberships=person_data.get("groups", {}),
-            gender=person_data.get("gender", "Neutral"),
-            age=int(person_data.get("age", 22)),
-            types=person_data.get("types", []),
-            crushes=person_data.get("crushes", []),
-            speed_vector=person_data.get("speed_vector", [4.0, 16.0, 48.0]),
-            prob_vector=person_data.get("prob_vector", [0.99, 0.70, 0.20])
-        )
+    def add_custom_person(self, person_data: dict, scenario_id: Optional[str] = None):
+        target_sid = scenario_id or self.current_scenario_id
+        self.store.add_node(target_sid, person_data)
+        if target_sid == self.current_scenario_id:
+            self.gm.add_person(
+                person_id=person_data["id"], name=person_data["name"],
+                psychometrics=person_data.get("psychometrics", {}),
+                schedule=person_data.get("schedule", {"tier": 1}),
+                group_memberships=person_data.get("groups", {}),
+                gender=person_data.get("gender", "Neutral"),
+                age=int(person_data.get("age", 22)),
+                types=person_data.get("types", []),
+                crushes=person_data.get("crushes", []),
+                speed_vector=person_data.get("speed_vector", [4.0, 16.0, 48.0]),
+                prob_vector=person_data.get("prob_vector", [0.99, 0.70, 0.20])
+            )
 
-    def delete_person(self, person_id: str) -> bool:
-        self.store.remove_node(self.current_scenario_id, person_id)
-        if self.gm.graph.has_node(person_id):
+    def delete_person(self, person_id: str, scenario_id: Optional[str] = None) -> bool:
+        target_sid = scenario_id or self.current_scenario_id
+        self.store.remove_node(target_sid, person_id)
+        if target_sid == self.current_scenario_id and self.gm.graph.has_node(person_id):
             self.gm.graph.remove_node(person_id)
-            return True
-        return False
+        return True
 
-    def add_custom_connection(self, conn_data: dict):
-        self.store.add_edge(self.current_scenario_id, conn_data)
-        self.gm.add_connection(
-            source_id=conn_data["source"], target_id=conn_data["target"],
-            channels=conn_data.get("channels", {}), flags=conn_data.get("flags", "")
-        )
+    def add_custom_connection(self, conn_data: dict, scenario_id: Optional[str] = None):
+        target_sid = scenario_id or self.current_scenario_id
+        self.store.add_edge(target_sid, conn_data)
+        if target_sid == self.current_scenario_id:
+            self.gm.add_connection(
+                source_id=conn_data["source"], target_id=conn_data["target"],
+                channels=conn_data.get("channels", {}), flags=conn_data.get("flags", "")
+            )
 
-    def delete_connection(self, source_id: str, target_id: str) -> bool:
-        self.store.remove_edge(self.current_scenario_id, source_id, target_id)
-        if self.gm.graph.has_edge(source_id, target_id):
+    def delete_connection(self, source_id: str, target_id: str, scenario_id: Optional[str] = None) -> bool:
+        target_sid = scenario_id or self.current_scenario_id
+        self.store.remove_edge(target_sid, source_id, target_id)
+        if target_sid == self.current_scenario_id and self.gm.graph.has_edge(source_id, target_id):
             self.gm.graph.remove_edge(source_id, target_id)
-            return True
-        return False
+        return True
 
     def export_full_config(self) -> str:
         sc = self.store.get(self.current_scenario_id)

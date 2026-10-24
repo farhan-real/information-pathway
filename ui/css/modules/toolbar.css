@@ -101,21 +101,93 @@
 .select-gradient { min-width: 130px; }
 
 /* Action Buttons */
-.action-cluster { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.action-cluster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-studio-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+.btn-studio-edit:hover {
+  background: #25282d;
+  border-color: #3f444d;
+  color: #ffffff;
+}
+.btn-studio-edit .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  transition: color 0.15s ease;
+}
+.btn-studio-edit:hover .btn-icon {
+  color: var(--accent-blue);
+}
+
 .btn-execute {
-  display: inline-flex; align-items: center; gap: 5px; background: var(--accent-blue);
-  color: #ffffff; border: none; font-weight: 600; font-size: 11px; padding: 6px 14px;
-  border-radius: 5px; cursor: pointer; white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 14px;
+  background: var(--accent-blue);
+  color: #ffffff;
+  border: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
 }
 .btn-execute:hover { background: #2563eb; }
 .btn-execute.reverse-mode { background: #9333ea; }
 .btn-execute.reverse-mode:hover { background: #7e22ce; }
 
 .btn-utility {
-  background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-dim);
-  padding: 5px 8px; font-size: 11px; border-radius: 5px; cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 0 8px;
+  font-size: 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
 }
-.btn-utility.icon-only { width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; }
+.btn-utility:hover {
+  background: #25282d;
+  border-color: #3f444d;
+  color: var(--text-main);
+}
+.btn-utility.icon-only {
+  width: 28px;
+  padding: 0;
+}
 
 /* Horizontally Scrollable Tags Cluster */
 .tags-cluster {

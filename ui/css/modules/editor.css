@@ -39,7 +39,6 @@
 }
 .sidebar-heading { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #8c939d; }
 
-/* Custom Styled New Scenario Button (Zero Default HTML Look) */
 .btn-scenario-new {
   display: inline-flex; align-items: center; gap: 4px; background: #181c22;
   border: 1px solid #2e3744; color: #60a5fa; font-family: var(--font-body);
@@ -75,7 +74,6 @@
 .workspace-title-wrap h3 { font-size: 13px; font-weight: 700; color: #f1f2f4; }
 .workspace-desc { font-size: 10px; color: #8c939d; margin-top: 2px; }
 
-/* Inner Sub-Tabs Contained Within This Scenario */
 .scenario-inner-tabs {
   display: flex; background: #0f1113; border-bottom: 1px solid #23272d;
   padding: 0 16px; gap: 6px; flex-shrink: 0;

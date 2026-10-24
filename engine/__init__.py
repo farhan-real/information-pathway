@@ -32,8 +32,8 @@ class SimulationService:
             "id": sc["id"], "name": sc["name"], "description": sc["description"],
             "topics": sc.get("topics", []), "incidents": sc.get("incidents", []),
             "groups": sc.get("groups", {}),
-            "nodes": [{"id": n["id"], "name": n["name"]} for n in sc.get("nodes", [])],
-            "edges": [{"source": e["source"], "target": e["target"], "channels": e.get("channels", {})} for e in sc.get("edges", [])]
+            "nodes": sc.get("nodes", []),
+            "edges": sc.get("edges", [])
         }
 
     def change_scenario(self, scenario_id: str) -> Dict[str, Any]:

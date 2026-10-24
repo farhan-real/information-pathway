@@ -265,7 +265,6 @@
           <!-- RIGHT WORKSPACE: ACTIVE SCENARIO CONTAINER -->
           <div id="scenario-workspace" class="studio-scenario-workspace">
             
-            <!-- HEADER OF THE CURRENT SCENARIO -->
             <div class="workspace-scenario-header">
               <div class="workspace-title-wrap">
                 <h3 id="current-scenario-title">Scenario Workspace</h3>
@@ -274,7 +273,6 @@
               <button id="btn-activate-scenario" class="btn-studio-primary">Load into Canvas</button>
             </div>
 
-            <!-- INNER SUB-TABS CONTAINED WITHIN THIS SCENARIO -->
             <div class="scenario-inner-tabs">
               <button class="inner-tab active" data-tab="scenario-people-pane">
                 <span>People</span>
@@ -289,7 +287,6 @@
               </button>
             </div>
 
-            <!-- WORKSPACE PANES -->
             <div class="workspace-panes-body">
               
               <!-- 1. PEOPLE INSIDE THIS SCENARIO -->
@@ -300,7 +297,10 @@
                     <div id="studio-people-list" class="entity-list-scroll"></div>
                   </div>
                   <div class="pane-form-col">
-                    <span class="col-title">+ Add Person to this Scenario</span>
+                    <div class="pane-form-header">
+                      <span id="people-form-title" class="col-title">+ Add Person to this Scenario</span>
+                      <button id="btn-cancel-person-edit" class="btn-studio-action hidden" title="Cancel edit">Cancel</button>
+                    </div>
                     <div class="studio-form">
                       <div class="form-grid-2">
                         <div class="field-block">
@@ -370,7 +370,10 @@
                     <div id="studio-conn-list" class="entity-list-scroll"></div>
                   </div>
                   <div class="pane-form-col">
-                    <span class="col-title">+ Add Relationship Channel</span>
+                    <div class="pane-form-header">
+                      <span id="conn-form-title" class="col-title">+ Add Relationship Channel</span>
+                      <button id="btn-cancel-conn-edit" class="btn-studio-action hidden" title="Cancel edit">Cancel</button>
+                    </div>
                     <div class="studio-form">
                       <div class="form-grid-2">
                         <div class="field-block">
